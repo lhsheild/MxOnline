@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.views import View
 from pure_pagination import PageNotAnInteger, Paginator
+from django.db.models import Q
 
 from apps.operation.models import UserFavorite, CourseComments, UserCourse
 from .models import Course, CourseResource, Video
@@ -15,6 +16,13 @@ class CourseListView(View):
         hot_courses = Course.objects.all().order_by('-click_nums')[:3]
         # 排序
         sort = request.GET.get('sort', "")
+
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            # icontains是包含的意思（不区分大小写）
+            # Q可以实现多个字段，之间是or的关系
+            all_courses = all_courses.filter(Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords) | Q(
+                detail__icontains=search_keywords))
 
         if sort:
             if sort == "students":

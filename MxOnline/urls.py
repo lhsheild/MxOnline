@@ -13,11 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+import xadmin
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
 from django.views.static import serve
 
-import xadmin
 from apps.users.views import LoginView, LogoutView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, \
     ModifyPwdView
 from .settings import MEDIA_ROOT
@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^reset/(?P<active_code>.*)/', ResetView.as_view(), name='reset'),
     url(r'^modify/$', ModifyPwdView.as_view(), name='modify'),
 
+    url(r"^users/", include('apps.users.urls', namespace="users")),
     url(r"^org/", include('apps.organization.urls', namespace="org")),
     url(r"^course/", include('apps.courses.urls', namespace="courses")),
 
