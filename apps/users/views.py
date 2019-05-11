@@ -141,7 +141,7 @@ class ModifyPwdView(View):
 class LogoutView(View):
     def get(self, request):
         auth.logout(request)
-        return render(request, 'index.html')
+        return HttpResponseRedirect(reverse('index'))
 
 
 class UserinfoView(LoginRequiredMixin, View):
