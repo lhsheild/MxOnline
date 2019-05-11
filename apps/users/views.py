@@ -292,33 +292,40 @@ class MyMessageView(View):
 
 class IndexView(View):
     '''首页'''
-    def get(self,request):
-        #轮播图
+
+    def get(self, request):
+        # 轮播图
         all_banners = Banner.objects.all().order_by('index')
-        #课程
+        # 课程
         courses = Course.objects.filter(is_banner=False)[:6]
-        #轮播课程
+        # 轮播课程
         banner_courses = Course.objects.filter(is_banner=True)[:3]
-        #课程机构
+        # 课程机构
         course_orgs = Course.objects.all()[:15]
-        return render(request,'index.html',{
-            'all_banners':all_banners,
-            'courses':courses,
-            'banner_courses':banner_courses,
-            'course_orgs':course_orgs,
+        return render(request, 'index.html', {
+            'all_banners': all_banners,
+            'courses': courses,
+            'banner_courses': banner_courses,
+            'course_orgs': course_orgs,
         })
 
 
 from django.shortcuts import render_to_response
-def pag_not_found(request):
+
+
+def pag_not_found(request, exception=None, template_name='404.html'):
     # 全局404处理函数
     response = render_to_response('404.html', {})
     response.status_code = 404
     return response
 
-def page_error(request):
+
+def page_error(request, exception=None, template_name='404.html'):
     # 全局500处理函数
     from django.shortcuts import render_to_response
     response = render_to_response('500.html', {})
     response.status_code = 500
     return response
+
+
+# def custom_404(request, exception=None, template_name='404.html'):

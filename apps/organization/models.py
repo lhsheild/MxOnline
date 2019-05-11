@@ -23,7 +23,7 @@ class CourseOrg(models.Model):
     fav_nums = models.IntegerField(default=0, verbose_name='收藏数')
     image = models.ImageField(upload_to='org/%Y/%m', verbose_name='封面图')
     address = models.CharField(max_length=150, verbose_name='机构地址')
-    city = models.ForeignKey(CityDict, verbose_name='所在城市')
+    city = models.ForeignKey(CityDict, verbose_name='所在城市', on_delete=models.CASCADE)
     category = models.CharField(max_length=20, choices=(("pxjg", u"培训机构"), ("gx", u"高校"), ("gr", u"个人"),),
                                 verbose_name=u"机构类别", default="pxjg")
     students = models.IntegerField("学习人数", default=0)
@@ -44,7 +44,7 @@ class CourseOrg(models.Model):
 
 
 class Teacher(models.Model):
-    org = models.ForeignKey(CourseOrg, verbose_name='所属机构')
+    org = models.ForeignKey(CourseOrg, verbose_name='所属机构', on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name='教师名')
     work_year = models.IntegerField(default=0, verbose_name='工作年限')
     work_company = models.CharField(max_length=50, verbose_name='就职公司')

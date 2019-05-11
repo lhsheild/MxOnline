@@ -21,7 +21,7 @@ PLUGINS = (
     'multiselect',
     'themes',
     'aggregation',
-    'mobile',
+    # 'mobile',
     'passwords',
     'sitemenu',
     'language',

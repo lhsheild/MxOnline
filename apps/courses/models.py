@@ -8,7 +8,7 @@ from apps.organization.models import CourseOrg, Teacher
 
 class Course(models.Model):
     name = models.CharField(max_length=50, verbose_name='课程名')
-    course_org = models.ForeignKey(CourseOrg, verbose_name='课程机构', null=True, blank=True)
+    course_org = models.ForeignKey(CourseOrg, verbose_name='课程机构', null=True, blank=True, on_delete=models.CASCADE)
     desc = models.CharField(max_length=300, verbose_name='课程描述')
     detail = UEditorField(verbose_name=u'课程详情', width=600, height=300, imagePath="courses/ueditor/",
                           filePath="courses/ueditor/", default='')
@@ -16,7 +16,7 @@ class Course(models.Model):
     learn_times = models.IntegerField(default=0, verbose_name='学习时长(分钟数)')
     students = models.IntegerField(default=0, verbose_name='学习人数')
     fav_nums = models.IntegerField(default=0, verbose_name='收藏人数')
-    image = models.ImageField(upload_to='courses/%Y/%m', verbose_name='封面图', max_length=100)
+    image = models.ImageField(upload_to='courses/%Y/%m', verbose_name='封面图', max_length=100, null=True, blank=True)
     click_nums = models.IntegerField(default=0, verbose_name='点击数')
     category = models.CharField(default="", max_length=20, verbose_name="课程类别")
     tag = models.CharField(verbose_name='课程标签', default='', max_length=10)
@@ -46,7 +46,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, verbose_name='课程')
+    course = models.ForeignKey(Course, verbose_name='课程', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, verbose_name='章节名', unique=True)
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')
 
@@ -63,7 +63,7 @@ class Lesson(models.Model):
 
 
 class Video(models.Model):
-    lesson = models.ForeignKey(Lesson, verbose_name='章节')
+    lesson = models.ForeignKey(Lesson, verbose_name='章节', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, verbose_name='视频名', unique=True)
     url = models.CharField(verbose_name='访问地址', default='', max_length=200)
     learn_times = models.IntegerField("学习时长(分钟数)", default=0)
@@ -78,7 +78,7 @@ class Video(models.Model):
 
 
 class CourseResource(models.Model):
-    course = models.ForeignKey(Course, verbose_name='课程')
+    course = models.ForeignKey(Course, verbose_name='课程', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, verbose_name='视频名')
     download = models.FileField(upload_to='course/resource/%Y/%m', verbose_name='资源文件', max_length=100, unique=True)
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')

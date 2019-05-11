@@ -35,9 +35,9 @@ urlpatterns = [
     url(r'^reset/(?P<active_code>.*)/', ResetView.as_view(), name='reset'),
     url(r'^modify/$', ModifyPwdView.as_view(), name='modify'),
 
-    url(r"^users/", include('apps.users.urls', namespace="users")),
-    url(r"^org/", include('apps.organization.urls', namespace="org")),
-    url(r"^course/", include('apps.courses.urls', namespace="courses")),
+    url(r"^users/", include(('apps.users.urls', 'users'), namespace="users")),
+    url(r"^org/", include(('apps.organization.urls', 'org'), namespace="org")),
+    url(r"^course/", include(('apps.courses.urls', 'course'), namespace="courses")),
 
     url(r'^captcha/', include('captcha.urls')),  # 验证码
     url(r'^media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
