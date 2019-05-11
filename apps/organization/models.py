@@ -28,6 +28,7 @@ class CourseOrg(models.Model):
                                 verbose_name=u"机构类别", default="pxjg")
     students = models.IntegerField("学习人数", default=0)
     course_nums = models.IntegerField("课程数", default=0)
+    tag = models.CharField('机构标签', max_length=10, default='全国知名')
     add_time = models.DateTimeField(default=datetime.now)
 
     class Meta:
@@ -66,3 +67,6 @@ class Teacher(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_course_nums(self):
+        return self.course_set.all().count()

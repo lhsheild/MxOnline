@@ -4,11 +4,16 @@ from django.contrib import auth
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, reverse
 from django.views.generic.base import View
+from pure_pagination import PageNotAnInteger, Paginator
 
 from apps.utils.email_send import send_register_email
 from apps.utils.mixin_utils import LoginRequiredMixin
+from apps.operation.models import UserCourse, UserFavorite, UserMessage
+from apps.organization.models import CourseOrg, Teacher
+from apps.courses.models import Course
+from apps.users.models import Banner
 from .forms import LoginForm, RegisterForm, ForgetPwdForm, ModifyPwdForm, UploadImageForm, UserInfoForm
 from .models import UserProfile, EmailVerifyRecord
 
@@ -37,11 +42,11 @@ class LoginView(View):
             if user:
                 if user.is_active:
                     auth.login(request, user)
-                    return render(request, 'index.html')
+                    return HttpResponseRedirect(reverse('index'))
                 else:
                     return render(request, 'login.html', {'msg': '用户未激活'})
             else:
-                return render(request, 'login.html', {'msg': '用户名或密码错误'})
+                return render(request, 'login.html', {'msg': '用户名或密码错误', 'login_form': login_form})
         else:
             return render(request, 'login.html', {'login_form': login_form})
 
@@ -210,9 +215,110 @@ class UserinfoView(LoginRequiredMixin, View):
         return render(request, 'usercenter-info.html')
 
     def post(self, request):
+        print(request.POST)
         user_info_form = UserInfoForm(request.POST, instance=request.user)
         if user_info_form.is_valid():
             user_info_form.save()
             return HttpResponse('{"status":"success"}', content_type='application/json')
         else:
             return HttpResponse(json.dumps(user_info_form.errors), content_type='application/json')
+
+
+class MyCourseView(View):
+    def get(self, request):
+        user_courses = UserCourse.objects.filter(user=request.user)
+        return render(request, "usercenter-mycourse.html", {
+            "user_courses": user_courses,
+        })
+
+
+class MyFavOrgView(View):
+    def get(self, request):
+        org_list = []
+        fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=2)
+        # 上面的fav_orgs只是存放了id。我们还需要通过id找到机构对象
+        for fav_org in fav_orgs:
+            # 取出fav_id也就是机构的id。
+            org_id = fav_org.fav_id
+            # 获取这个机构对象
+            org = CourseOrg.objects.get(id=org_id)
+            org_list.append(org)
+        return render(request, "usercenter-fav-org.html", {
+            "org_list": org_list,
+        })
+
+
+class MyFavTeacherView(View):
+    def get(self, request):
+        teacher_list = []
+        fav_teachers = UserFavorite.objects.filter(user=request.user, fav_type=3)
+        for fav_teacher in fav_teachers:
+            teacher_id = fav_teacher.fav_id
+            teacher = Teacher.objects.get(id=teacher_id)
+            teacher_list.append(teacher)
+        return render(request, "usercenter-fav-teacher.html", {
+            "teacher_list": teacher_list,
+        })
+
+
+class MyFavCourseView(View):
+    def get(self, request):
+        course_list = []
+        fav_courses = UserFavorite.objects.filter(user=request.user, fav_type=1)
+        for fav_course in fav_courses:
+            course_id = fav_course.fav_id
+            course = Course.objects.get(id=course_id)
+            course_list.append(course)
+
+        return render(request, 'usercenter-fav-course.html', {
+            "course_list": course_list,
+        })
+
+
+class MyMessageView(View):
+    def get(self, request):
+        all_message = UserMessage.objects.filter(user=request.user.id)
+
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(all_message, 4, request=request)
+        messages = p.page(page)
+        return render(request, "usercenter-message.html", {
+            "messages": messages,
+        })
+
+
+class IndexView(View):
+    '''首页'''
+    def get(self,request):
+        #轮播图
+        all_banners = Banner.objects.all().order_by('index')
+        #课程
+        courses = Course.objects.filter(is_banner=False)[:6]
+        #轮播课程
+        banner_courses = Course.objects.filter(is_banner=True)[:3]
+        #课程机构
+        course_orgs = Course.objects.all()[:15]
+        return render(request,'index.html',{
+            'all_banners':all_banners,
+            'courses':courses,
+            'banner_courses':banner_courses,
+            'course_orgs':course_orgs,
+        })
+
+
+from django.shortcuts import render_to_response
+def pag_not_found(request):
+    # 全局404处理函数
+    response = render_to_response('404.html', {})
+    response.status_code = 404
+    return response
+
+def page_error(request):
+    # 全局500处理函数
+    from django.shortcuts import render_to_response
+    response = render_to_response('500.html', {})
+    response.status_code = 500
+    return response

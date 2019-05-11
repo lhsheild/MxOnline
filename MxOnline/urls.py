@@ -20,7 +20,7 @@ from django.views.static import serve
 
 from apps.users.views import LoginView, LogoutView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, \
     ModifyPwdView
-from .settings import MEDIA_ROOT
+from .settings import MEDIA_ROOT, STATIC_ROOT
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -40,4 +40,10 @@ urlpatterns = [
 
     url(r'^captcha/', include('captcha.urls')),  # 验证码
     url(r'^media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
+    url(r'^static/(?P<path>.*)', serve, {"document_root": STATIC_ROOT}),
 ]
+
+# 全局404页面配置
+handler404 = 'apps.users.views.pag_not_found'
+# 全局500页面配置
+handler500 = 'apps.users.views.page_error'
