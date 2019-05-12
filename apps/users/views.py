@@ -294,7 +294,6 @@ class IndexView(View):
     """
     首页
     """
-
     def get(self, request):
         # 轮播图
         all_banners = Banner.objects.all().order_by('index')
