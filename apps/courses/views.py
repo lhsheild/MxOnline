@@ -82,11 +82,13 @@ class CourseDetailView(View):
 
 
 class CourseInfoView(LoginRequiredMixin, View):
-    '''课程章节信息'''
-
+    """
+    课程章节信息
+    """
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
         all_resources = CourseResource.objects.filter(course=course)
+
 
         course.students += 1
         course.save()

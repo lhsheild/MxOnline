@@ -291,7 +291,9 @@ class MyMessageView(View):
 
 
 class IndexView(View):
-    '''首页'''
+    """
+    首页
+    """
 
     def get(self, request):
         # 轮播图
@@ -310,11 +312,9 @@ class IndexView(View):
         })
 
 
-from django.shortcuts import render_to_response
-
-
 def pag_not_found(request, exception=None, template_name='404.html'):
     # 全局404处理函数
+    from django.shortcuts import render_to_response
     response = render_to_response('404.html', {})
     response.status_code = 404
     return response
@@ -326,6 +326,5 @@ def page_error(request, exception=None, template_name='404.html'):
     response = render_to_response('500.html', {})
     response.status_code = 500
     return response
-
 
 # def custom_404(request, exception=None, template_name='404.html'):
