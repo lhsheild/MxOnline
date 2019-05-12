@@ -22,6 +22,11 @@ class UserProfile(AbstractUser):
     def __str__(self):
         return self.username
 
+    def get_unread_msg_nums(self):
+        from apps.operation.models import UserMessage
+        user_message = UserMessage.objects.filter(user=self.id, has_read=False)
+        return user_message.count()
+
 
 class EmailVerifyRecord(models.Model):
     send_choices = (

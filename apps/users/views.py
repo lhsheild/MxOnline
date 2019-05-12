@@ -83,6 +83,12 @@ class RegisterView(View):
             user_profile.password = make_password(pass_word)
             user_profile.save()
 
+            # 欢迎信息
+            user_message = UserMessage()
+            user_message.user = user_profile.id
+            user_message.message = 'welcome to MxOnline！'
+            user_message.save()
+
             send_register_email(user_name, 'register')
             return render(request, 'index.html', locals())
         else:
@@ -150,15 +156,10 @@ class UserinfoView(LoginRequiredMixin, View):
 
 
 class UploadImageView(LoginRequiredMixin, View):
-    '''用户图像修改'''
-
     def post(self, request):
-        print(request.FILES)
         # 上传的文件都在request.FILES里面获取，所以这里要多传一个这个参数
         image_form = UploadImageForm(request.POST, request.FILES)
         if image_form.is_valid():
-            for i in image_form.cleaned_data:
-                print(i)
             image = image_form.cleaned_data['image']
             request.user.image = image
             request.user.save()
@@ -224,7 +225,7 @@ class UserinfoView(LoginRequiredMixin, View):
             return HttpResponse(json.dumps(user_info_form.errors), content_type='application/json')
 
 
-class MyCourseView(View):
+class MyCourseView(LoginRequiredMixin, View):
     def get(self, request):
         user_courses = UserCourse.objects.filter(user=request.user)
         return render(request, "usercenter-mycourse.html", {
@@ -232,7 +233,7 @@ class MyCourseView(View):
         })
 
 
-class MyFavOrgView(View):
+class MyFavOrgView(LoginRequiredMixin, View):
     def get(self, request):
         org_list = []
         fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=2)
@@ -248,7 +249,7 @@ class MyFavOrgView(View):
         })
 
 
-class MyFavTeacherView(View):
+class MyFavTeacherView(LoginRequiredMixin, View):
     def get(self, request):
         teacher_list = []
         fav_teachers = UserFavorite.objects.filter(user=request.user, fav_type=3)
@@ -261,7 +262,7 @@ class MyFavTeacherView(View):
         })
 
 
-class MyFavCourseView(View):
+class MyFavCourseView(LoginRequiredMixin, View):
     def get(self, request):
         course_list = []
         fav_courses = UserFavorite.objects.filter(user=request.user, fav_type=1)
@@ -275,16 +276,18 @@ class MyFavCourseView(View):
         })
 
 
-class MyMessageView(View):
+class MyMessageView(LoginRequiredMixin,View):
     def get(self, request):
         all_message = UserMessage.objects.filter(user=request.user.id)
-
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
             page = 1
         p = Paginator(all_message, 4, request=request)
         messages = p.page(page)
+        for i in messages.object_list:
+            i.has_read = True
+            i.save()
         return render(request, "usercenter-message.html", {
             "messages": messages,
         })
@@ -302,7 +305,7 @@ class IndexView(View):
         # 轮播课程
         banner_courses = Course.objects.filter(is_banner=True)[:3]
         # 课程机构
-        course_orgs = Course.objects.all()[:15]
+        course_orgs = CourseOrg.objects.all()[:15]
         return render(request, 'index.html', {
             'all_banners': all_banners,
             'courses': courses,
@@ -325,5 +328,3 @@ def page_error(request, exception=None, template_name='404.html'):
     response = render_to_response('500.html', {})
     response.status_code = 500
     return response
-
-# def custom_404(request, exception=None, template_name='404.html'):

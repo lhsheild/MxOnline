@@ -237,7 +237,9 @@
                         </div>
                     </div>
                     <a href="usercenter-message.html">
-                        <div class="msg-num"><span id="MsgNum">0</span></div>
+                        <div class="msg-num">{% if request.user.get_unread_msg_nums > 0 %}<span id="MsgNum">
+                                {{ request.user.get_unread_msg_nums }}
+                            </span>{% endif %}</div>
                     </a>
 
 

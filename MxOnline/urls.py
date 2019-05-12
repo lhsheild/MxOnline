@@ -20,7 +20,7 @@ from django.views.static import serve
 
 from apps.users.views import LoginView, LogoutView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, \
     ModifyPwdView, IndexView
-from .settings import MEDIA_ROOT, STATIC_ROOT
+from .settings import MEDIA_ROOT
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -36,12 +36,12 @@ urlpatterns = [
     url(r'^modify/$', ModifyPwdView.as_view(), name='modify'),
 
     url(r"^users/", include(('apps.users.urls', 'users'), namespace="users")),
-    url(r"^org/", include(('apps.organization.urls', 'org'), namespace="org")),
-    url(r"^course/", include(('apps.courses.urls', 'course'), namespace="courses")),
+    url(r"^org/", include(('apps.organization.urls', 'organization'), namespace="org")),
+    url(r"^course/", include(('apps.courses.urls', 'courses'), namespace="courses")),
 
     url(r'^captcha/', include('captcha.urls')),  # 验证码
     url(r'^media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
-    url(r'^static/(?P<path>.*)', serve, {"document_root": STATIC_ROOT}),
+    # url(r'^static/(?P<path>.*)', serve, {"document_root": STATIC_ROOT}),
 ]
 
 # 全局404页面配置

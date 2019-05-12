@@ -48,7 +48,7 @@ def send_register_email(email, send_type='register'):
             pass
 
     if send_type == "update_email":
-        email_title = "NBA邮箱修改验证码"
+        email_title = "MxOnline修改邮箱验证码"
         email_body = "你的邮箱验证码为{0}".format(code)
 
         # 使用Django内置函数完成邮件发送。四个参数：主题，邮件内容，从哪里发，接受者list
